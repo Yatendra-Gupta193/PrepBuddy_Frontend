@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% block title %}PrepBuddy AI - Login{% endblock %}
+{% block content %}
+<div class="auth-page">
+<div class="auth-card">
+<div class="auth-logo">⏱</div>
+<h1>Welcome to PrepBuddy</h1>
+<p class="auth-subtitle">Clinical preparation management system</p>
+{% if messages %}
+<div class="auth-messages">
+{% for message in messages %}
+<div class="message {{ message.tags }}">{{ message }}</div>
+{% endfor %}
+</div>
+{% endif %}
+<form method="post">
+{% csrf_token %}
+<div class="form-group">
+<label>Email Address</label>
+<input type="email" name="email" placeholder="Enter your email" required>
+</div>
+<div class="form-group">
+<label>Password</label>
+<input type="password" name="password" placeholder="Enter your password" required>
+</div>
+<div class="form-options">
+<label class="remember"><input type="checkbox"> Remember me</label>
+<a href="#">Forgot password?</a>
+</div>
+<button type="submit" class="login-btn">Sign In</button>
+</form>
+<div class="auth-footer">Don't have an account? <a href="{% url 'register' %}">Create account</a></div>
+</div>
+</div>
+{% endblock %}

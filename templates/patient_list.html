@@ -1,0 +1,99 @@
+{% extends "base.html" %}
+{% block title %}PrepBuddy AI - Patient List{% endblock %}
+{% block content %}
+<div class="page-heading-row">
+  <div>
+    <div class="breadcrumb">Dashboard / Patient Management</div>
+    <h1 class="page-title">Patient List</h1>
+    <p class="page-description">Track each patient’s prep readiness and upcoming procedure status.</p>
+  </div>
+  <a href="{% url 'add_patient' %}" class="btn btn-nudge">+ Add Patient</a>
+</div>
+
+<div class="stats-grid">
+  <div class="stat-card">
+    <span class="stat-label">TOTAL PATIENTS</span>
+    <span class="stat-value">{{ total_patients }}</span>
+    <span class="stat-description">Active roster</span>
+  </div>
+  <div class="stat-card">
+    <span class="stat-label">READY</span>
+    <span class="stat-value ready-value">{{ ready_count }}</span>
+    <span class="stat-description">Prepared for procedure</span>
+  </div>
+  <div class="stat-card">
+    <span class="stat-label">PENDING</span>
+    <span class="stat-value pending-value">{{ pending_count }}</span>
+    <span class="stat-description">Awaiting confirmation</span>
+  </div>
+  <div class="stat-card">
+    <span class="stat-label">AT RISK</span>
+    <span class="stat-value risk-value">{{ risk_count }}</span>
+    <span class="stat-description">Needs intervention</span>
+  </div>
+</div>
+
+<div class="upcoming-panel">
+  <div class="upcoming-header">
+    <div>
+      <h2>Patient Management</h2>
+      <p>Search and filter the current prep schedule.</p>
+    </div>
+    <form method="get" class="filter-form">
+      <input type="text" name="search" value="{{ search }}" placeholder="Search name, ID, procedure..." class="filter-input">
+      <select name="status" class="filter-input" style="width:140px;">
+        <option value="all" {% if status_filter == 'all' %}selected{% endif %}>All Status</option>
+        <option value="ready" {% if status_filter == 'ready' %}selected{% endif %}>Ready</option>
+        <option value="pending" {% if status_filter == 'pending' %}selected{% endif %}>Pending</option>
+        <option value="risk" {% if status_filter == 'risk' %}selected{% endif %}>At Risk</option>
+      </select>
+      <button type="submit" class="filter-button">Apply</button>
+    </form>
+  </div>
+
+  <div class="upcoming-table-header">
+    <div>Patient</div>
+    <div>ID</div>
+    <div>Procedure</div>
+    <div>Date / Time</div>
+    <div>Status</div>
+    <div>Actions</div>
+  </div>
+
+  {% if patients %}
+    {% for patient in patients %}
+    <div class="upcoming-row">
+      <div class="patient-cell">
+        <span class="avatar purple-avatar">{{ patient.initials|default:'PT' }}</span>
+        <div>
+          <strong>{{ patient.name }}</strong>
+          <small>{{ patient.physician }}</small>
+        </div>
+      </div>
+      <div>{{ patient.id|upper }}</div>
+      <div>{{ patient.procedure }}</div>
+      <div>{{ patient.procedure_time }}</div>
+      <div>
+        {% if patient.status == 'ready' %}
+          <span class="status-badge ready-status">Ready</span>
+        {% elif patient.status == 'pending' %}
+          <span class="status-badge pending-status">Pending</span>
+        {% else %}
+          <span class="status-badge risk-status">At Risk</span>
+        {% endif %}
+      </div>
+      <div class="action-buttons">
+        <a href="{% url 'patient_detail' patient_id=patient.id %}" class="timeline-button">View</a>
+        <a href="{% url 'edit_patient' patient_id=patient.id %}" class="timeline-button">Edit</a>
+        <a href="{% url 'delete_patient' patient_id=patient.id %}" class="timeline-button" style="color:#c52e4f;">Delete</a>
+      </div>
+    </div>
+    {% endfor %}
+  {% else %}
+    <div class="not-found-card">
+      <h2>No patients match this search.</h2>
+      <p>Try a different name, ID, physician, or status filter.</p>
+    </div>
+  {% endif %}
+</div>
+{% endblock %}

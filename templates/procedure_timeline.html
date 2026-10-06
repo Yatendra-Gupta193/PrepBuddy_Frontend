@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+{% block title %}PrepBuddy AI - Procedure Timeline{% endblock %}
+{% block content %}
+{% if patient %}
+<div class="breadcrumb">Dashboard / Procedure Details / proc-{{ patient_id }}</div>
+<div class="timeline-top">
+<div>
+<div class="timeline-badges">
+<span class="blue-badge">Time-Anchored Micro-Reminder</span>
+{% if patient.risk %}<span class="risk-badge">⚠ At Risk Milestone</span>{% else %}<span class="confirmed-label">✓ All Milestones Verified</span>{% endif %}
+</div>
+<h1 class="timeline-title">{{ patient.procedure }}</h1>
+<p class="timeline-date">▣ {{ patient.procedure_time }}</p>
+</div>
+<div class="timeline-patient">
+<span class="section-label">PATIENT</span>
+<strong>{{ patient.name }} →</strong>
+<span>{{ patient.physician }} · {{ patient.suite }}</span>
+</div>
+</div>
+<div class="timeline-card">
+<div class="timeline-heading">
+<h2>◷ PREPARATION PROTOCOL TIMELINE</h2>
+<p>Time-anchored milestones automatically computed for {{ patient.name }}'s procedure.</p>
+</div>
+{% for step in patient.steps %}
+<div class="timeline-step {% if step.status == 'confirmed' %}confirmed{% elif step.status == 'risk' %}overdue{% else %}pending{% endif %}">
+<div class="timeline-marker">{% if step.status == "confirmed" %}✓{% elif step.status == "risk" %}!{% else %}○{% endif %}</div>
+<div class="timeline-content">
+<div class="timeline-main">
+<span class="timeline-time">{{ step.time }}</span>
+<strong>{{ step.name }}</strong>
+{% if step.status == "confirmed" %}<span class="confirmed-label">✓ Confirmed</span>{% elif step.status == "risk" %}<span class="not-confirmed-label">⚠ Not confirmed</span>{% else %}<span class="pending-label">Pending</span>{% endif %}
+</div>
+<p>{{ step.description }}</p>
+<div class="timeline-meta">Reminder Channel: <span>{{ step.channel }}</span> · {{ step.sent }}</div>
+{% if step.action %}
+<div class="timeline-actions">
+<form method="post" action="{% url 'send_reminder' patient_id=patient_id step_index=forloop.counter0 %}">
+{% csrf_token %}
+<button type="submit" class="btn btn-nudge">Push Reminder</button>
+</form>
+<form method="post" action="{% url 'confirm_step' patient_id=patient_id step_index=forloop.counter0 %}">
+{% csrf_token %}
+<button type="submit" class="btn btn-verify">✓ Mark Confirmed</button>
+</form>
+</div>
+{% elif step.status == "confirmed" %}
+<form method="post" action="{% url 'undo_step' patient_id=patient_id step_index=forloop.counter0 %}">
+{% csrf_token %}
+<button type="submit" class="undo-btn">Undo Confirmation</button>
+</form>
+{% endif %}
+</div>
+</div>
+{% endfor %}
+</div>
+{% else %}
+<div class="not-found">
+<h1>Procedure Not Found</h1>
+<p>No procedure found for patient ID: {{ patient_id }}</p>
+<a href="/">← Back to Dashboard</a>
+</div>
+{% endif %}
+{% endblock %}

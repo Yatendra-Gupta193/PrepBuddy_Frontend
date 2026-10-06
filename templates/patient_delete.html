@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+{% block title %}PrepBuddy AI - Delete Patient{% endblock %}
+{% block content %}
+<div class="breadcrumb">Patient Management / Delete Patient</div>
+<div class="auth-page">
+  <div class="auth-card">
+    <div class="auth-logo">♧</div>
+    <h1>Delete Patient</h1>
+    <p class="auth-subtitle">This action cannot be undone.</p>
+
+    {% if patient %}
+      <div class="patient-card" style="padding:20px; margin-bottom:20px;">
+        <div class="section-label">PATIENT</div>
+        <h2>{{ patient.name }}</h2>
+        <div class="patient-info">{{ patient.id|upper }} · {{ patient.procedure }}</div>
+      </div>
+
+      <form method="post" action="{% url 'delete_patient' patient_id=patient_id %}">
+        {% csrf_token %}
+        <button type="submit" class="login-btn" style="background:#d92d50;">Delete Patient</button>
+      </form>
+    {% else %}
+      <div class="not-found-card">
+        <h2>Patient Not Found</h2>
+        <p>No patient was found to delete.</p>
+      </div>
+    {% endif %}
+
+    <div class="auth-footer">
+      <a href="{% url 'patients' %}">Cancel</a>
+    </div>
+  </div>
+</div>
+{% endblock %}

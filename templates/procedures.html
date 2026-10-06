@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+{% block title %}PrepBuddy AI - Procedure Timeline{% endblock %}
+{% block content %}
+<div class="breadcrumb">Dashboard / Procedure Timeline</div>
+<div class="dashboard-header">
+    <div>
+        <h1 class="page-title">Procedure Timeline</h1>
+        <p class="page-description">Track preparation milestones and intervention status for all active procedures.</p>
+    </div>
+</div>
+
+{% if patients %}
+<div class="risk-panel">
+    <div class="risk-header">
+        <div>
+            <h2>ACTIVE PROCEDURES</h2>
+            <p>{{ total_procedures }} procedures in the current workflow</p>
+        </div>
+        <span class="urgent-badge">Live Tracking</span>
+    </div>
+
+    {% for patient in patients %}
+    <div class="upcoming-row">
+        <div class="patient-cell">
+            <div class="avatar {% if patient.id == 'rahul' %}purple-avatar{% elif patient.id == 'priya' %}pink-avatar{% else %}green-avatar{% endif %}">{{ patient.initials }}</div>
+            <div>
+                <strong>{{ patient.name }}</strong>
+                <small>ID: {{ patient.id }}</small>
+            </div>
+        </div>
+        <div>
+            <strong>{{ patient.procedure }}</strong>
+        </div>
+        <div>
+            <span class="time-text">{{ patient.procedure_time }}</span>
+        </div>
+        <div>
+            {% if patient.status == 'ready' %}
+                <span class="status-badge ready-status">✓ Ready</span>
+            {% elif patient.status == 'risk' %}
+                <span class="status-badge risk-status">⚠ At Risk</span>
+            {% else %}
+                <span class="status-badge pending-status">Pending</span>
+            {% endif %}
+        </div>
+        <div>
+            <a href="{% url 'procedure_timeline' patient_id=patient.id %}" class="timeline-button">Open Timeline →</a>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% else %}
+<div class="not-found">
+    <h1>No procedures available.</h1>
+    <p>Add a patient to create a procedure timeline.</p>
+</div>
+{% endif %}
+{% endblock %}

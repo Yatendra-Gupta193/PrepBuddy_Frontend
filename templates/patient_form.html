@@ -1,0 +1,92 @@
+{% extends "base.html" %}
+{% block title %}{% if mode == 'edit' %}PrepBuddy AI - Edit Patient{% else %}PrepBuddy AI - Add Patient{% endif %}{% endblock %}
+{% block content %}
+<div class="breadcrumb">Patient Management / {% if mode == 'edit' %}Edit Patient{% else %}Add Patient{% endif %}</div>
+<div class="auth-page">
+  <div class="auth-card register-card">
+    <div class="auth-logo">♧</div>
+    <h1>{% if mode == 'edit' %}Edit Patient{% else %}Add Patient{% endif %}</h1>
+    <p class="auth-subtitle">Create or update the patient preparation record.</p>
+
+    <form method="post" action="{% if mode == 'edit' %}{% url 'edit_patient' patient_id=patient_id %}{% else %}{% url 'add_patient' %}{% endif %}">
+      {% csrf_token %}
+
+      <div class="form-group">
+        <label for="patient_id">Patient ID</label>
+        <input id="patient_id" name="patient_id" type="text" value="{{ patient.patient_id|default_if_none:'' }}" required>
+      </div>
+
+      <div class="form-group">
+        <label for="name">Full Name</label>
+        <input id="name" name="name" type="text" value="{{ patient.name|default_if_none:'' }}" required>
+      </div>
+
+      <div class="form-group">
+        <label for="gender">Gender</label>
+        <select id="gender" name="gender" required>
+          <option value="">Select</option>
+          <option value="Male" {% if patient.gender == 'Male' %}selected{% endif %}>Male</option>
+          <option value="Female" {% if patient.gender == 'Female' %}selected{% endif %}>Female</option>
+          <option value="Other" {% if patient.gender == 'Other' %}selected{% endif %}>Other</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label for="age">Age</label>
+        <input id="age" name="age" type="number" min="1" value="{{ patient.age|default_if_none:'' }}" required>
+      </div>
+
+      <div class="form-group">
+        <label for="phone">Phone</label>
+        <input id="phone" name="phone" type="text" value="{{ patient.phone|default_if_none:'' }}" required>
+      </div>
+
+      <div class="form-group">
+        <label for="email">Email</label>
+        <input id="email" name="email" type="email" value="{{ patient.email|default_if_none:'' }}" required>
+      </div>
+
+      <div class="form-group">
+        <label for="procedure">Procedure</label>
+        <input id="procedure" name="procedure" type="text" value="{{ patient.procedure|default_if_none:'' }}" required>
+      </div>
+
+      <div class="form-group">
+        <label for="procedure_date">Procedure Date</label>
+        <input id="procedure_date" name="procedure_date" type="date" value="{{ patient.procedure_date|default_if_none:'' }}" required>
+      </div>
+
+      <div class="form-group">
+        <label for="procedure_time">Procedure Time</label>
+        <input id="procedure_time" name="procedure_time" type="time" value="{{ patient.procedure_time|default_if_none:'' }}" required>
+      </div>
+
+      <div class="form-group">
+        <label for="physician">Physician</label>
+        <input id="physician" name="physician" type="text" value="{{ patient.physician|default_if_none:'' }}" required>
+      </div>
+
+      <div class="form-group">
+        <label for="suite">Suite</label>
+        <input id="suite" name="suite" type="text" value="{{ patient.suite|default_if_none:'' }}" required>
+      </div>
+
+      <div class="form-group">
+        <label for="protocol">Preparation Protocol</label>
+        <select id="protocol" name="protocol" required>
+          <option value="">Select protocol</option>
+          <option value="colonoscopy" {% if patient.protocol == 'colonoscopy' %}selected{% endif %}>Colonoscopy</option>
+          <option value="upper-gi" {% if patient.protocol == 'upper-gi' %}selected{% endif %}>Upper GI</option>
+          <option value="sigmoidoscopy" {% if patient.protocol == 'sigmoidoscopy' %}selected{% endif %}>Sigmoidoscopy</option>
+        </select>
+      </div>
+
+      <button type="submit" class="login-btn">{% if mode == 'edit' %}Update Patient{% else %}Create Patient{% endif %}</button>
+    </form>
+
+    <div class="auth-footer">
+      <a href="{% url 'patients' %}">Back to patient list</a>
+    </div>
+  </div>
+</div>
+{% endblock %}

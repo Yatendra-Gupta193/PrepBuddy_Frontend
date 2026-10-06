@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+{% block title %}PrepBuddy AI - Protocol Details{% endblock %}
+{% block content %}
+{% if protocol %}
+<div class="breadcrumb">Dashboard / Preparation Protocols / {{ protocol.title }}</div>
+<div class="page-heading-row">
+<div>
+<h1 class="page-title">{{ protocol.title }}</h1>
+<p class="page-description">{{ protocol.description }}</p>
+</div>
+<span class="management-badge">Active Protocol</span>
+</div>
+<div class="protocol-detail-card">
+<div class="protocol-detail-header">
+<div>
+<span class="section-label">CLINICAL PROTOCOL</span>
+<h2>{{ protocol.title }}</h2>
+<p class="protocol-meta">{{ protocol.steps }} · {{ protocol.department }}</p>
+</div>
+<span class="active-badge">Active</span>
+</div>
+<div class="protocol-description">
+<p>{{ protocol.description }}</p>
+</div>
+</div>
+<div class="protocol-steps-card">
+<div class="protocol-steps-header">
+<div>
+<h2>PREPARATION STEPS</h2>
+<p>Time-anchored preparation milestones for this procedure</p>
+</div>
+<span class="steps-count">{{ protocol.steps }}</span>
+</div>
+<div class="protocol-steps-list">
+{% for item in protocol.items %}
+<div class="protocol-step-item">
+<div class="protocol-step-number">{{ item.0 }}</div>
+<div class="protocol-step-content">
+<div class="protocol-step-title">
+<h3>{{ item.1 }}</h3>
+<span class="protocol-time">◷ {{ item.2 }}</span>
+</div>
+<p>{{ item.3 }}</p>
+</div>
+</div>
+{% endfor %}
+</div>
+</div>
+<div class="protocol-actions">
+<a href="{% url 'protocols' %}" class="back-button">← Back to Protocols</a>
+</div>
+{% else %}
+<div class="not-found-card">
+<h1>Protocol Not Found</h1>
+<p>The requested preparation protocol could not be found.</p>
+<a href="{% url 'protocols' %}" class="back-button">← Back to Protocols</a>
+</div>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% block title %}PrepBuddy AI - Register{% endblock %}
+{% block content %}
+<div class="auth-page">
+<div class="auth-card register-card">
+<div class="auth-logo">⏱</div>
+<h1>Create your account</h1>
+<p class="auth-subtitle">Register your clinical staff account</p>
+{% if messages %}
+<div class="auth-messages">
+{% for message in messages %}
+<div class="auth-message">{{ message }}</div>
+{% endfor %}
+</div>
+{% endif %}
+{% if error %}
+<div class="auth-error">{{ error }}</div>
+{% endif %}
+<form method="POST" action="{% url 'register' %}">
+{% csrf_token %}
+<div class="form-group">
+<label for="name">Full Name</label>
+<input type="text" id="name" name="name" value="{{ name|default:'' }}" placeholder="Enter your full name" required>
+</div>
+<div class="form-group">
+<label for="email">Email Address</label>
+<input type="email" id="email" name="email" value="{{ email|default:'' }}" placeholder="Enter your email" required>
+</div>
+<div class="form-group">
+<label for="role">Role</label>
+<select id="role" name="role" required>
+<option value="clinic_staff">Clinic Staff</option>
+<option value="doctor">Doctor</option>
+</select>
+</div>
+<div class="form-group">
+<label for="password">Password</label>
+<input type="password" id="password" name="password" placeholder="Create a password" required>
+</div>
+<div class="form-group">
+<label for="confirm_password">Confirm Password</label>
+<input type="password" id="confirm_password" name="confirm_password" placeholder="Confirm your password" required>
+</div>
+<button type="submit" class="login-btn">Create Account</button>
+</form>
+<div class="auth-footer">
+Already have an account?
+<a href="{% url 'login' %}">Sign in</a>
+</div>
+</div>
+</div>
+{% endblock %}

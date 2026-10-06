@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% block title %}PrepBuddy AI - Protocols{% endblock %}
+{% block content %}
+<div class="breadcrumb">Dashboard / Preparation Protocols</div>
+<div class="protocol-header">
+<div>
+<h1 class="page-title">Preparation Protocols</h1>
+<p class="page-description">Standard operating procedures and time-anchored micro-reminder interval templates</p>
+</div>
+<span class="management-badge">Protocol Management</span>
+</div>
+<div class="protocol-section-title">
+ACTIVE CLINICAL PROTOCOLS (3)
+</div>
+<div class="protocol-list">
+<div class="protocol-card">
+<div>
+<div class="protocol-title-row">
+<h2>Colonoscopy Preparation</h2>
+<span class="active-badge">Active</span>
+</div>
+<p class="protocol-meta">4 preparation steps · Gastroenterology</p>
+<p class="protocol-description">Standard split-dose bowel lavage regimen with time-anchored hydration and clear liquid milestones.</p>
+</div>
+<a href="/protocols/colonoscopy/" class="view-button">View →</a>
+</div>
+<div class="protocol-card">
+<div>
+<div class="protocol-title-row">
+<h2>Upper GI Endoscopy</h2>
+<span class="active-badge">Active</span>
+</div>
+<p class="protocol-meta">3 preparation steps · Gastroenterology</p>
+<p class="protocol-description">Gastric emptying fasting protocol to guarantee clear mucosal visualization and airway safety.</p>
+</div>
+<a href="/protocols/upper-gi/" class="view-button">View →</a>
+</div>
+<div class="protocol-card">
+<div>
+<div class="protocol-title-row">
+<h2>Flexible Sigmoidoscopy</h2>
+<span class="active-badge">Active</span>
+</div>
+<p class="protocol-meta">3 preparation steps · Colorectal</p>
+<p class="protocol-description">Targeted distal bowel evacuation enema protocol with morning light diet restrictions.</p>
+</div>
+<a href="/protocols/sigmoidoscopy/" class="view-button">View →</a>
+</div>
+</div>
+{% endblock %}

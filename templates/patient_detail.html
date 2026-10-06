@@ -1,0 +1,115 @@
+{% extends "base.html" %}
+{% block title %}PrepBuddy AI - Patient Details{% endblock %}
+{% block content %}
+{% if patient %}
+<div class="breadcrumb">Dashboard / Patient Details / {{ patient_id|upper }}</div>
+<div class="patient-header">
+<div>
+<h1 class="page-title">Patient Details</h1>
+<p class="page-description">Patient preparation and procedure status</p>
+</div>
+<div class="demo-select">{{ patient.name }} ({{ patient.procedure }}) ▾</div>
+</div>
+<div class="patient-card">
+<div class="card-top">
+<div>
+<div class="section-label">PATIENT PROFILE</div>
+<h2>{{ patient.name }}</h2>
+<div class="patient-info">{{ patient.gender }} · {{ patient.age }} years</div>
+</div>
+<div class="gender-badge">{{ patient.gender }}, {{ patient.age }} yrs</div>
+</div>
+<div class="contact-row">
+<div>
+<span class="section-label">PHONE</span>
+<div class="phone">{{ patient.phone }}</div>
+</div>
+{% if patient.steps %}
+<form method="POST" action="{% url 'send_reminder' patient_id=patient_id step_index=0 %}">
+{% csrf_token %}
+<button type="submit" class="whatsapp-btn">◉ WhatsApp Nudge</button>
+</form>
+{% endif %}
+</div>
+</div>
+<div class="procedure-card">
+<div class="procedure-top">
+<div>
+<div class="section-label">UPCOMING PROCEDURE</div>
+<h2>{{ patient.procedure }}</h2>
+<div class="procedure-time">▣ {{ patient.procedure_time }}</div>
+<div class="procedure-doctor">Physician: {{ patient.physician }} · Suite: {{ patient.suite }}</div>
+</div>
+<a href="{% url 'procedure_timeline' patient_id=patient_id %}" class="timeline-link">Interactive Timeline →</a>
+</div>
+</div>
+<div class="progress-card">
+<div class="progress-header">
+<div>
+<h2>PREPARATION PROGRESS</h2>
+<p>Micro-milestone confirmation status for procedure safety</p>
+</div>
+{% if patient.status == "ready" %}
+<span class="intervention-badge ready-intervention">✓ Ready</span>
+{% elif patient.status == "pending" %}
+<span class="intervention-badge pending-intervention">◷ Pending Confirmation</span>
+{% else %}
+<span class="intervention-badge">⚠ At Risk</span>
+{% endif %}
+</div>
+{% for step in patient.steps %}
+<div class="prep-step {% if step.status == 'confirmed' %}confirmed{% elif step.status == 'risk' %}overdue{% endif %}">
+<div class="step-icon">
+{% if step.status == "confirmed" %}
+✓
+{% elif step.status == "risk" %}
+!
+{% else %}
+○
+{% endif %}
+</div>
+<div class="step-content">
+<div class="step-title">{{ step.name }} <span>{{ step.time }}</span></div>
+<div class="step-status">{{ step.message }}</div>
+</div>
+{% if step.status == "confirmed" %}
+<div class="step-actions">
+<form method="POST" action="{% url 'undo_step' patient_id=patient_id step_index=forloop.counter0 %}">
+{% csrf_token %}
+<button type="submit" class="btn btn-nudge">Uncheck</button>
+</form>
+</div>
+{% elif step.status == "risk" %}
+<div class="step-actions">
+<form method="POST" action="{% url 'send_reminder' patient_id=patient_id step_index=forloop.counter0 %}">
+{% csrf_token %}
+<button type="submit" class="btn btn-nudge">Send Reminder</button>
+</form>
+<form method="POST" action="{% url 'confirm_step' patient_id=patient_id step_index=forloop.counter0 %}">
+{% csrf_token %}
+<button type="submit" class="btn btn-verify">✓ Mark Confirmed</button>
+</form>
+</div>
+{% elif step.status == "pending" %}
+<div class="step-actions">
+<form method="POST" action="{% url 'send_reminder' patient_id=patient_id step_index=forloop.counter0 %}">
+{% csrf_token %}
+<button type="submit" class="btn btn-nudge">Send Reminder</button>
+</form>
+<form method="POST" action="{% url 'confirm_step' patient_id=patient_id step_index=forloop.counter0 %}">
+{% csrf_token %}
+<button type="submit" class="btn btn-verify">✓ Mark Confirmed</button>
+</form>
+</div>
+{% endif %}
+</div>
+{% endfor %}
+</div>
+{% else %}
+<div class="not-found">
+<h1>Patient Not Found</h1>
+<p>No patient found for ID: {{ patient_id }}</p>
+<a href="{% url 'dashboard' %}">← Back to Dashboard</a>
+</div>
+{% endif %}
+{% endblock %}

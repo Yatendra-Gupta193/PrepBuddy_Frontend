@@ -1,0 +1,75 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>{% block title %}PrepBuddy AI{% endblock %}</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="{% static 'style.css' %}">
+</head>
+<body>
+<div class="app">
+{% if request.user.is_authenticated %}
+<nav class="navbar">
+<div class="logo-section">
+<div class="logo-icon">♧</div>
+<div class="logo-text">PrepBuddy</div>
+<span class="clinical-label">CLINICAL</span>
+</div>
+<div class="main-nav">
+<a href="{% url 'dashboard' %}" class="{% if request.path == '/' %}active{% endif %}">Dashboard</a>
+<a href="{% url 'patients' %}" class="{% if '/patients' in request.path %}active{% endif %}">Patient Details</a>
+<a href="{% url 'procedures' %}" class="{% if '/procedures' in request.path %}active{% endif %}">Procedure Timeline</a>
+<a href="{% url 'protocols' %}" class="{% if '/protocols' in request.path %}active{% endif %}">Protocols</a>
+</div>
+<div class="doctor-profile">
+<div class="doctor-avatar">
+{% if request.session.user_name %}
+{{ request.session.user_name|slice:":2"|upper }}
+{% else %}
+DS
+{% endif %}
+</div>
+<div>
+<div class="doctor-name">
+{% if request.session.user_name %}
+{{ request.session.user_name }}
+{% else %}
+Dr. Sharma
+{% endif %}
+</div>
+<div class="doctor-role">Lead Gastroenterologist</div>
+</div>
+{% if request.session.user_id %}
+<form method="post" action="{% url 'logout' %}" class="logout-form">
+{% csrf_token %}
+<button type="submit" class="logout-btn">Logout</button>
+</form>
+{% endif %}
+</div>
+</nav>
+{% else %}
+<nav class="navbar auth-navbar">
+<div class="logo-section">
+<div class="logo-icon">♧</div>
+<div class="logo-text">PrepBuddy</div>
+<span class="clinical-label">CLINICAL</span>
+</div>
+</nav>
+{% endif %}
+<main class="main">
+{% if messages %}
+<div class="message-container">
+{% for message in messages %}
+<div class="message {% if message.tags %}{{ message.tags }}{% endif %}">{{ message }}</div>
+{% endfor %}
+</div>
+{% endif %}
+{% block content %}{% endblock %}
+</main>
+</div>
+</body>
+</html>

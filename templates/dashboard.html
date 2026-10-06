@@ -1,0 +1,185 @@
+{% extends "base.html" %}
+{% block title %}PrepBuddy AI - Clinical Dashboard{% endblock %}
+{% block content %}
+<div class="breadcrumb">Dashboard</div>
+<div class="dashboard-header">
+<div>
+<h1 class="page-title">Clinical Dashboard</h1>
+<p class="page-description">Real-time tracking of patient pre-procedure compliance</p>
+</div>
+</div>
+<div class="stats-grid">
+<div class="stat-card">
+<span class="stat-label">PROCEDURES</span>
+<strong class="stat-value">{{ procedures }}</strong>
+<span class="stat-description">Active pipeline</span>
+</div>
+<div class="stat-card">
+<span class="stat-label">READY</span>
+<strong class="stat-value ready-value">{{ ready }}</strong>
+<span class="stat-description">All steps verified</span>
+</div>
+<div class="stat-card">
+<span class="stat-label">PENDING</span>
+<strong class="stat-value pending-value">{{ pending }}</strong>
+<span class="stat-description">Upcoming windows</span>
+</div>
+<div class="stat-card">
+<span class="stat-label">AT RISK</span>
+<strong class="stat-value risk-value">{{ risk }}</strong>
+<span class="stat-description">Action required</span>
+</div>
+</div>
+<div class="risk-panel">
+<div class="risk-header">
+<div>
+<h2>⚠ AT RISK PREPARATIONS</h2>
+<p>Patients who missed time-anchored confirmation windows. Intervention advised to avoid same-day cancellation.</p>
+</div>
+<span class="urgent-badge">{{ risk }} Urgent Cases</span>
+</div>
+{% if risk_patients %}
+<div class="risk-table">
+<div class="risk-table-header">
+<span>PATIENT</span>
+<span>PROCEDURE</span>
+<span>MISSING STEP</span>
+<span>SCHEDULED TIME</span>
+<span>INTERVENTION</span>
+</div>
+{% for patient in risk_patients %}
+<div class="risk-row">
+<div class="patient-cell">
+<div class="avatar {% if patient.id == 'rahul' %}purple-avatar{% elif patient.id == 'priya' %}pink-avatar{% else %}green-avatar{% endif %}">{{ patient.initials }}</div>
+<div>
+<strong>{{ patient.name }}</strong>
+<small>ID: {{ patient.id }}</small>
+</div>
+</div>
+<div>{{ patient.procedure }}</div>
+<div>
+{% for step in patient.risk_steps %}
+<span class="missing-badge">⚠ {{ step.name }}</span>
+{% endfor %}
+</div>
+<div>
+{% for step in patient.risk_steps %}
+<div class="risk-time-line">
+<span class="time-text">◷ {{ step.time }}</span>
+<span class="overdue-badge">OVERDUE</span>
+</div>
+{% endfor %}
+</div>
+<div class="action-buttons">
+<form method="POST" action="{% url 'send_reminder' patient_id=patient.id step_index=patient.primary_risk_index %}" style="display:inline;">
+{% csrf_token %}
+<button type="submit" class="btn btn-nudge">Nudge</button>
+</form>
+<form method="POST" action="{% url 'confirm_step' patient_id=patient.id step_index=patient.primary_risk_index %}" style="display:inline;">
+{% csrf_token %}
+<button type="submit" class="btn btn-verify">✓ Verify</button>
+</form>
+<a href="{% url 'procedure_timeline' patient_id=patient.id %}" class="timeline-button">Timeline →</a>
+</div>
+</div>
+{% endfor %}
+</div>
+{% else %}
+<div class="no-risk-message">
+<p>✓ No patients are currently at risk.</p>
+</div>
+{% endif %}
+</div>
+<div class="upcoming-panel">
+<div class="upcoming-header">
+<div>
+<h2>UPCOMING PROCEDURES</h2>
+<p>Live operational roster and preparation clearance status</p>
+</div>
+<form method="GET" action="" class="filter-form" id="filterForm">
+<input type="text" id="patientFilter" name="search" value="{{ request.GET.search }}" class="filter-input" placeholder="Filter patient or procedure...">
+<button type="submit" class="filter-button">Search</button>
+</form>
+</div>
+<div class="upcoming-table" id="upcomingTable">
+<div class="upcoming-table-header">
+<span>PATIENT</span>
+<span>PROCEDURE</span>
+<span>DATE / TIME</span>
+<span>PREP STATUS</span>
+<span>ACTIONS</span>
+</div>
+{% for patient in patients %}
+<div class="upcoming-row searchable-row" data-search="{{ patient.name|lower }} {{ patient.id|lower }} {{ patient.procedure|lower }} {{ patient.physician|lower }} {{ patient.suite|lower }}">
+<div class="patient-cell">
+<div class="avatar {% if patient.id == 'rahul' %}purple-avatar{% elif patient.id == 'priya' %}pink-avatar{% else %}green-avatar{% endif %}">{{ patient.initials }}</div>
+<div>
+<strong>{{ patient.name }}</strong>
+<small>{{ patient.physician }} · {{ patient.suite }}</small>
+</div>
+</div>
+<div>
+<strong>{{ patient.procedure }}</strong>
+<small>
+{% if patient.status == "ready" %}All steps verified{% elif patient.status == "risk" %}Action required{% else %}Upcoming window{% endif %}
+</small>
+</div>
+<div>{{ patient.procedure_time }}</div>
+<div>
+{% if patient.status == "ready" %}
+<span class="status-badge ready-status">✓ Ready</span>
+{% elif patient.status == "risk" %}
+<span class="status-badge risk-status">⚠ At Risk</span>
+{% else %}
+<span class="status-badge pending-status">◷ Pending</span>
+{% endif %}
+</div>
+<div>
+<a href="{% url 'procedure_timeline' patient_id=patient.id %}" class="timeline-button">Timeline →</a>
+</div>
+</div>
+{% empty %}
+<div class="no-risk-message">
+<p>No procedures found.</p>
+</div>
+{% endfor %}
+</div>
+</div>
+<script>
+document.addEventListener("DOMContentLoaded",function(){
+const input=document.getElementById("patientFilter");
+const rows=document.querySelectorAll(".searchable-row");
+const form=document.getElementById("filterForm");
+function filterRows(){
+const value=input.value.toLowerCase().trim();
+let visible=0;
+rows.forEach(function(row){
+const text=row.dataset.search||"";
+if(text.includes(value)){
+row.style.display="";
+visible++;
+}else{
+row.style.display="none";
+}
+});
+let message=document.getElementById("searchEmpty");
+if(visible===0&&value){
+if(!message){
+message=document.createElement("div");
+message.id="searchEmpty";
+message.className="no-risk-message";
+message.innerHTML="<p>No procedures found.</p>";
+document.getElementById("upcomingTable").appendChild(message);
+}
+}else if(message){
+message.remove();
+}
+}
+input.addEventListener("input",filterRows);
+form.addEventListener("submit",function(event){
+event.preventDefault();
+filterRows();
+});
+});
+</script>
+{% endblock %}
