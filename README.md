@@ -1,4 +1,4 @@
-# PrepBuddy AI – Intelligent Pre-Procedure Preparation Management System
+# PrepBuddy AI – Intelligent Pre-Procedure Preparation Management System 
 
 PrepBuddy AI is a Django-rendered clinical workflow prototype for monitoring patient preparation before a procedure. Its staff-facing interface brings patient records, procedure readiness, preparation milestones, and protocol reference information together in one place.
 
